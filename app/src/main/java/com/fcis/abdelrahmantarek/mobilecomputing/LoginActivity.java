@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -19,14 +17,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.realm.Realm;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText email, pw;
     CheckBox remember;
-    Button login, register;
+    Button login, register,cat,item;
     TextView forgot;
     private boolean emailGood;
     private boolean pwGood;
+    private Realm realm;
+    private int catCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +37,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Login");
         setSupportActionBar(toolbar);
+        realm= Realm.getDefaultInstance();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean loggedin = preferences.getBoolean("remember", false);
         if(loggedin){
             Intent intent = new Intent(this,HomeActivity.class);
             startActivity(intent);
         }
+        catCount = preferences.getInt("catCount",0);
         //init UI
         email = findViewById(R.id.email_ET);
         pw = findViewById(R.id.pw_ET);
@@ -48,10 +52,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         login = findViewById(R.id.login_BTN);
         register = findViewById(R.id.register_BTN);
         forgot = findViewById(R.id.fp_TV);
+        cat = findViewById(R.id.add_category);
+        item = findViewById(R.id.add_item);
 
         forgot.setOnClickListener(this);
         register.setOnClickListener(this);
         login.setOnClickListener(this);
+        cat.setOnClickListener(this);
+        item.setOnClickListener(this);
 
         email.addTextChangedListener(new TextWatcher() {
             @Override
@@ -112,6 +120,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.add_category:
+                DialogAddCategory dialogAddCategory = new DialogAddCategory();
+                dialogAddCategory.show(getFragmentManager(),"ADD CATEGORY");
+                break;
+            case R.id.add_item:
+                DialogAddProduct addProduct = new DialogAddProduct();
+                addProduct.show(getFragmentManager(),"ADD PRODUCT");
+                break;
             case R.id.register_BTN:
                 Intent intent = new Intent(this, RegisterActivity.class);
                 startActivity(intent);

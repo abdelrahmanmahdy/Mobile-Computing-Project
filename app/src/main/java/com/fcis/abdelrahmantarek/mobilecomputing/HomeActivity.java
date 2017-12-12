@@ -3,6 +3,7 @@ package com.fcis.abdelrahmantarek.mobilecomputing;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,16 +13,47 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
+import com.fcis.abdelrahmantarek.mobilecomputing.beans.Category;
+import com.fcis.abdelrahmantarek.mobilecomputing.beans.Product;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Realm realm;
+    ListView catList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Items");
         setSupportActionBar(toolbar);
+
+        realm = Realm.getDefaultInstance();
+        catList = findViewById(R.id.categories_list);
+
+
+        RealmResults<Product> results = realm.where(Product.class).findAll();
+        Log.d("Cat", "onCreate: "+results.size());
+        List<String> res = new ArrayList<>();
+        for(int i =0;i<results.size();i++){
+            Log.d("Cat", "onCreate: "+results.get(i).getName());
+            res.add(results.get(i).getName() +" "+results.get(i).getId());
+        }
+
+        ListAdapter adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,res);
+        catList.setAdapter(adapter);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -71,19 +103,7 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
