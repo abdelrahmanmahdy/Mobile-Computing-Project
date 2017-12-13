@@ -36,4 +36,8 @@
     <string name="cat_id">cat id</string>
     <string name="search">search</string>
     <string name="cart">cart</string>
+    <string name="title_activity_cart">Cart</string>
+    <string name="confirm">confirm</string>
+    <string name="enter_quantity">Enter Quantity</string>
+    <string name="quantity">quantity</string>
 </resources>

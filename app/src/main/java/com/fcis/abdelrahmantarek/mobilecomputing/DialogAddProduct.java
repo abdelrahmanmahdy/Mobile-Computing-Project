@@ -33,7 +33,6 @@ public class DialogAddProduct extends DialogFragment {
 
     private void addAction() {
         final Product category = new Product() ;
-        category.setId(Integer.parseInt(id.getText().toString()));
         category.setName(name.getText().toString());
         category.setPrice(Double.parseDouble(price.getText().toString()));
         category.setCatId(Long.parseLong(catId.getText().toString()));

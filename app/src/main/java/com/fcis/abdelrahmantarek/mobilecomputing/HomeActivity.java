@@ -1,5 +1,6 @@
 package com.fcis.abdelrahmantarek.mobilecomputing;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,12 +20,15 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.fcis.abdelrahmantarek.mobilecomputing.beans.Category;
+import com.fcis.abdelrahmantarek.mobilecomputing.beans.Order;
 import com.fcis.abdelrahmantarek.mobilecomputing.beans.Product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class HomeActivity extends AppCompatActivity
@@ -34,6 +38,8 @@ public class HomeActivity extends AppCompatActivity
     ListView catList, prodList;
     List<String> prods;
     ListAdapter prodsAdapter;
+    DrawerLayout drawer;
+    Order order;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +48,32 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Items");
         setSupportActionBar(toolbar);
+        realm = Realm.getDefaultInstance();
+
+
+        order = new Order();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm mRealm) {
+                mRealm.copyToRealmOrUpdate(order);
+            }
+        });
+        realm.close();
+
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         realm = Realm.getDefaultInstance();
         catList = findViewById(R.id.categories_list);
+
         prodList = findViewById(R.id.products_list);
+
         RealmResults<Product> products = realm.where(Product.class).findAll();
         prods = new ArrayList<>();
-        for (int i = 0; i < products.size(); i++) {
+        for (
+                int i = 0; i < products.size(); i++)
+
+        {
             prods.add(products.get(i).getName());
         }
 
@@ -59,7 +84,10 @@ public class HomeActivity extends AppCompatActivity
         Log.d("Cat", "onCreate: " + results.size());
         List<String> res = new ArrayList<>();
         res.add("ALL");
-        for (int i = 0; i < results.size(); i++) {
+        for (
+                int i = 0; i < results.size(); i++)
+
+        {
             Log.d("Cat", "onCreate: " + results.get(i).getName());
             res.add(results.get(i).getName());
         }
@@ -67,7 +95,9 @@ public class HomeActivity extends AppCompatActivity
         ListAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, res);
         catList.setAdapter(adapter);
 
-        catList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        catList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+
+        {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 prods = new ArrayList<>();
@@ -82,6 +112,21 @@ public class HomeActivity extends AppCompatActivity
                 }
                 prodsAdapter = new ArrayAdapter<>(HomeActivity.this, android.R.layout.simple_list_item_1, prods);
                 prodList.setAdapter(prodsAdapter);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+
+        prodList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle b = new Bundle();
+                b.putString("product", prods.get(position));
+                b.putLong("order", order.getId());
+                AddToCartDialog dialog = new AddToCartDialog();
+                dialog.setArguments(b);
+                dialog.show(getFragmentManager(), "AddToCart");
             }
         });
 
@@ -97,7 +142,6 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -120,6 +164,11 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.cart) {
+            Intent intent = new Intent(this, CartActivity.class);
+            intent.putExtra("order", order.getId());
+            startActivity(intent);
+        }
 
 
         return super.onOptionsItemSelected(item);

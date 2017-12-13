@@ -11,17 +11,13 @@ import io.realm.annotations.Required;
 public class Product extends RealmObject {
 
     @PrimaryKey
-    private int id;
+    private long id;
     private String name;
     private double price;
     private long catId;
 
-    public int getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -46,5 +42,9 @@ public class Product extends RealmObject {
 
     public void setCatId(long catId) {
         this.catId = catId;
+    }
+
+    public Product() {
+        id = System.currentTimeMillis();
     }
 }
